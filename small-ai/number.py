@@ -1,11 +1,9 @@
-import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from PIL import Image, ImageDraw
-import cv2
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib.font_manager import FontProperties
@@ -28,11 +26,13 @@ model = keras.Sequential([
 ])
 
 
-# 编译模型
-print("编译模型...")
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+# 这个取消注释就行，但没必要
+
+## 编译模型
+#print("编译模型...")
+#model.compile(optimizer='adam',
+#              loss='sparse_categorical_crossentropy',
+#              metrics=['accuracy'])
 
 ## 训练模型
 #print("训练模型...")
@@ -50,7 +50,7 @@ class DrawingApp:
         self.root.title("手写数字识别")
         
         # 设置中文字体
-        self.chinese_font = FontProperties(fname='./os/fonts/SimHei.ttf')
+        self.chinese_font = FontProperties(fname='./fonts/SimHei.ttf')
         plt.rcParams['axes.unicode_minus'] = False    # 解决负号显示问题
         
         # 创建主框架
@@ -72,6 +72,13 @@ class DrawingApp:
         
         clear_button = ttk.Button(btn_frame, text="清除", command=self.clear_canvas)
         clear_button.pack(side=tk.LEFT, padx=5)
+        
+        # 添加保存和加载模型按钮
+        save_button = ttk.Button(btn_frame, text="保存模型", command=self.save_model)
+        save_button.pack(side=tk.LEFT, padx=5)
+        
+        load_button = ttk.Button(btn_frame, text="加载模型", command=self.load_model)
+        load_button.pack(side=tk.LEFT, padx=5)
         
         # 右侧概率显示区域
         prob_frame = ttk.Frame(main_frame)
@@ -181,6 +188,27 @@ class DrawingApp:
                         ha='center', va='bottom')
         
         self.canvas_prob.draw()
+
+    def save_model(self):
+        """保存模型到文件"""
+        file_path = filedialog.asksaveasfilename(defaultextension=".h5", 
+                                                   filetypes=[("H5 Files", "*.h5"), ("All Files", "*.*")])
+        if file_path:  # 确保用户选择了文件
+            try:
+                self.model.save(file_path)
+                tk.messagebox.showinfo("成功", f"模型已保存到 {file_path}")
+            except Exception as e:
+                tk.messagebox.showerror("错误", f"保存模型时出错：{str(e)}")
+    
+    def load_model(self):
+        """从文件加载模型"""
+        file_path = filedialog.askopenfilename(filetypes=[("H5 Files", "*.h5"), ("All Files", "*.*")])
+        if file_path:  # 确保用户选择了文件
+            try:
+                self.model = keras.models.load_model(file_path)
+                tk.messagebox.showinfo("成功", f"模型已从 {file_path} 加载")
+            except Exception as e:
+                tk.messagebox.showerror("错误", f"加载模型时出错：{str(e)}")
 
 # 训练完模型后启动绘图界面
 def main():
