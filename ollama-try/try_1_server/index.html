@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <script>
+        async function askQuestion() {
+            const question = document.getElementById('question').value;
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question })
+            });
+            const data = await response.json();
+            document.getElementById('answer').innerText = data.answer;
+        }
+    </script>
+</head>
+<body>
+    <h1>AI Chatbot</h1>
+    <input type="text" id="question" placeholder="请输入问题">
+    <button onclick="askQuestion()">提问</button>
+    <p>答案: <span id="answer"></span></p>
+</body>
+</html>
